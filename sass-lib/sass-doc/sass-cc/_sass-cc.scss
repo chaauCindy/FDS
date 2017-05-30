@@ -1,0 +1,16 @@
+/// width, height 를 빠르게 처리하는 헬퍼 믹스인
+/// @access  pubilc
+/// @author  cc
+/// @param   {Number | auto | Null} - width, height 속성 값
+/// @content width, height를 빠르게 작성한다.
+/// @example sass
+///     .demo
+///         @include size(920px, 330px);
+///
+///     .demo
+///         @include size(920px);   //2번째 인자 생략시 height 값은 null로 설정
+
+@mixin size($width : auto, $height: null){
+    width: $width;
+    height: $height;
+}

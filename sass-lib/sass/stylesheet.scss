@@ -1,0 +1,13 @@
+// Sass 라이브러리 모듈 로드
+@import 'lib/yamoo9';
+
+// 스타일 디자인
+.box{
+    @include color(#fff);
+    @include size(100px);
+    @include bg-color(#333, 0.45);
+
+    @extend %center-box-block;
+    // text-align: center;
+    // line-height: 100px;
+}

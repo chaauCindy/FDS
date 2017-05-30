@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <form name="user_info">
+        <fieldset>
+            <legend>사용자 정보 입력 폼</legend>
+            
+            <label for="user_name">이름</label>
+            <input type="text" name="user_name" id="user_name" required>
+            
+            <label for="user_email">이메일</label>
+            <input type="email" name="user_email" id="user_email">
+
+            <span>성별</span>
+            <label for="user_male"><input type="radio" name="user_gender" id="user_male" value="male" checked>남성</label>
+            <label for="user_female"><input type="radio" name="user_gender" id="user_female" value="female">여성</label>
+
+            <label for="user_age">나이</label>
+            <input type="number" name="user_age" id="user_age">
+
+            <button type="button" id="btn-validator">유효값 검사</button>
+        </fieldset>
+    </form>
+    <script src="./js/02.javascript-validatoion.js"></script>
+</body>
+</html>
