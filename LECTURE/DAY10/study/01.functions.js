@@ -108,7 +108,7 @@ var countDownMaker = function(n) {
 var countUpMaker = function(n) {
   n = n || 10;
   return function(step) {
-    n += (step || 1);
+    n += (step || 1);iife
     return n;
   };
 };
