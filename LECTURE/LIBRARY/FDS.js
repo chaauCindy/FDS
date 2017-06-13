@@ -2,6 +2,10 @@
 
 var FDS = function(global){
 
+  // ——————————————————————————————————————
+  // JavaScript 유틸리티 함수
+  // ——————————————————————————————————————
+
   function type(data) {
     return Object.prototype.toString.call(data).slice(8,-1).toLowerCase();
   }
@@ -60,6 +64,109 @@ var FDS = function(global){
     return Array.prototype.slice.call(o);
   }
 
+  // ——————————————————————————————————————
+  // DOM 검증 유틸리티 함수
+  // ——————————————————————————————————————
+  function isElNode(node) {
+    return node.nodeType === 1;
+  }
+  function validateElNode(el_node) {
+    if ( !el_node || !isElNode(el_node) ) {
+      throw '요소노드를 반드시 전달해야 합니다';
+    }
+  }
+
+  // ——————————————————————————————————————
+  // DOM 선택 API: 유틸리티 함수
+  // ——————————————————————————————————————
+  function id(name) {
+    validateError(name, '!string', '전달인자는 문자여야 합니다.');
+    return document.getElementById(name);
+  }
+  function tagAll(name, context) {
+    validateError(name, '!string', '전달인자는 문자여야 합니다.');
+    if ( context && !isElNode(context) ) {
+      throw '두번째 전달인자는 요소노드여야 합니다.';
+    }
+    return (context||document).getElementsByTagName(name);
+  }
+  function tag(name, context) {
+    return tagAll(name, context)[0];
+  }
+  // ——————————————————————————————————————
+  // DOM 탐색 API: 유틸리티 함수
+  // ——————————————————————————————————————
+  var firstChild = function(){
+    var _firstChild = null;
+    // 조건을 1번만 확인
+    if ( 'firstElementChild' in Element.prototype ) {
+      _firstChild = function(el_node) {
+        validateElNode(el_node);
+        return el_node.firstElementChild;
+      };
+    } else {
+      _firstChild = function(el_node) {
+        validateElNode(el_node);
+        return el_node.children[0];
+      };
+    }
+    return _firstChild;
+  }();
+  var lastChild = function(){
+    var _lastChild = null;
+    if ( 'lastElementChild' in Element.prototype ) {
+      _lastChild = function(el_node) {
+        validateElNode(el_node);
+        return el_node.lastElementChild;
+      };
+    } else {
+      _lastChild = function(el_node) {
+        validateElNode(el_node);
+        var children = el_node.children;
+        return children[ --children.length ];
+      };
+    }
+    return _lastChild;
+  }();
+  var nextSibling = function() {
+    var _nextSibling;
+    if ( 'nextElementSibling' in Element.prototype ) {
+      _nextSibling = function(el_node) {
+        validateElNode(el_node);
+        return el_node.nextElementSibling;
+      };
+    } else {
+      _nextSibling = function(el_node) {
+        validateElNode(el_node);
+        do {
+          el_node = el_node.nextSibling;
+        } while(el_node && !isElNode(el_node));
+      };
+      return el_node;
+    }
+    return _nextSibling;
+  }();
+  var previousSibling = function() {
+    var _previousSibling;
+    if ( 'previousElementSibling' in Element.prototype ) {
+      _previousSibling = function(el_node) {
+        validateElNode(el_node);
+        return el_node.previousElementSibling;
+      };
+    } else {
+      _previousSibling = function(el_node) {
+        validateElNode(el_node);
+        do {
+          el_node = el_node.previousSibling;
+        } while(el_node && !isElNode(el_node));
+        return el_node;
+      };
+    }
+    return _previousSibling;
+  }();
+
+  // ---------------------------------------
+  // 반환: FDS 네임스페이스 객체
   return {
     info: {
       version: '0.0.1',
@@ -68,12 +175,22 @@ var FDS = function(global){
       license: 'MIT'
     },
     // 공개 API
+    // JavaScript 유틸리티
     isNumber:      isNumber,
     isFunction:    isFunction,
     isArray:       isArray,
     isObject:      isObject,
     makeArray:     makeArray,
-    validateError: validateError
+    validateError: validateError,
+    // DOM 선택 API: 유틸리티
+    id: id,
+    tagAll: tagAll,
+    tag: tag,
+    // DOM 탐색 API: 유틸리티
+    first: firstChild,
+    last: lastChild,
+    prev: previousSibling,
+    next: nextSibling
   };
 
 }(window);
