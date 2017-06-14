@@ -7,7 +7,6 @@ var FDS = function(global){
   // ——————————————————————————————————————
   // JavaScript 유틸리티 함수
   // ——————————————————————————————————————
-
   function type(data) {
     return Object.prototype.toString.call(data).slice(8,-1).toLowerCase();
   }
@@ -76,9 +75,10 @@ var FDS = function(global){
     return node.nodeType === document.TEXT_NODE;
   }
   function validateElementNode(node) {
-    if ( !node || !isElementNode(node) ) {
-      throw '요소노드를 반드시 전달해야 합니다';
-    }
+    if ( !node || !isElementNode(node) ) { throw '요소노드를 반드시 전달해야 합니다'; }
+  }
+  function validateElementNodeOrDocument(node) {
+    if ( node !== document && !isElementNode(node) ) { throw '두번째 인자로 요소노드를 전달해 주세요'; }
   }
 
   // ——————————————————————————————————————
@@ -90,7 +90,7 @@ var FDS = function(global){
   }
   function tagAll(name, context) {
     validateError(name, '!string', '전달인자는 문자여야 합니다.');
-    if ( context && !isElementNode(context) ) {
+    if ( context && !isElementNode(context) && context !== document ) {
       throw '두번째 전달인자는 요소노드여야 합니다.';
     }
     return (context||document).getElementsByTagName(name);
@@ -98,6 +98,45 @@ var FDS = function(global){
   function tag(name, context) {
     return tagAll(name, context)[0];
   }
+  var classAll = function(){
+    var _classAll = null;
+    if ( 'getElementsByClassNames' in Element.prototype ) {
+      _classAll = function(name, context) {
+        validateError(name, '!string', '첫번째 전달인자는 문자열을 전달해야 합니다.');
+        context = context || document;
+        validateElementNodeOrDocument(context);
+        return context.getElementsByClassName(name);
+      };
+    } else {
+      _classAll = function(name, context) {
+        validateError(name, '!string', '첫번째 전달인자는 문자열이어야 합니다.');
+        context = context || document;
+        validateElementNodeOrDocument(context);
+        var _alls = tagAll('*', context);
+        var _matched = [];
+        var match = new RegExp('(^|\\s)' + name + '($|\\s)');
+        for ( var i=0, l=_alls.length; i<l; ++i ) {
+          var _el = _alls.item(i);
+          if ( match.test(_el.className) ) { _matched.push(_el); }
+        }
+        return _matched;
+      };
+    }
+    return _classAll;
+  }();
+  var classSingle = function(name, context) {
+    return classAll(name, context)[0];
+  };
+  var queryAll = function(selector, context){
+    validateError(selector, '!string', '첫번째 인자는 CSS 선택자 문자열이어야 합니다.');
+    context = context || document;
+    validateElementNodeOrDocument(context);
+    return context.querySelectorAll(selector);
+  };
+  var query = function(selector, context){
+    return queryAll(selector, context)[0];
+  };
+
   // ——————————————————————————————————————
   // DOM 탐색 API: 유틸리티 함수
   // ——————————————————————————————————————
@@ -184,13 +223,17 @@ var FDS = function(global){
   // ---------------------------------------
   // 반환: FDS 네임스페이스 객체
   return {
+
+    // 라이브러리 정보
     info: {
       version: '0.0.1',
       author: 'yamoo9',
       url: 'https://yamoo9.github.io/FDS',
       license: 'MIT'
     },
+
     // 공개 API
+
     // JavaScript 유틸리티
     type:          type,
     isNumber:      isNumber,
@@ -199,10 +242,16 @@ var FDS = function(global){
     isObject:      isObject,
     makeArray:     makeArray,
     validateError: validateError,
+
     // DOM 선택 API: 유틸리티
     id: id,
     tagAll: tagAll,
     tag: tag,
+    classAll: classAll,
+    classSingle: classSingle,
+    selector: query,
+    selectorAll: queryAll,
+
     // DOM 탐색 API: 유틸리티
     first: firstChild,
     last: lastChild,
@@ -210,6 +259,7 @@ var FDS = function(global){
     next: nextSibling,
     parent: parent,
     hasChild: hasChild
+
   };
 
 }(window);
