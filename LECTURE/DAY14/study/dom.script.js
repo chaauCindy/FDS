@@ -105,7 +105,7 @@
 ;(function(global, document, _){
   'use strict';
 
-  // unsplash.it 이미지 소스 인덱스/대체텍스트 데이터
+  // https://unsplash.it 이미지 소스 인덱스/대체텍스트 데이터
   var data = [
     {
       index: '1068',
@@ -149,7 +149,138 @@
     },
   ];
 
+  // 새로운 아이템 추가
+  data.push({
+    index: 1062,
+    alt: '청순 Dog~~'
+  });
+
   // 미션! 하드코딩하지 않고, 동적으로 코드를 생성/붙여보자.
   // 내비게이션 인디케이터를 동적으로 생성한다.
+
+  // 동적 생성해야 할 템플릿 코드
+  // <li role="presentation">
+  //   <a href class="photo-showcase-indicator" role="tab">
+  //     <img src="https://unsplash.it/100/100?image=" alt="">
+  //   </a>
+  // </li>
+
+  var controller = _.selector('.photo-showcase-controller [role=tablist]');
+
+  for ( var i=0, l=data.length; i<l; ++i ) {
+
+    var item = data[i];
+    var index = item.index;
+    var alt = item.alt;
+
+    var li = _.createEl('li');
+    li.setAttribute('role', 'presentation');
+
+    var a = _.createEl('a');
+    a.setAttribute('role', 'tab');
+    a.setAttribute('href', '');
+    a.setAttribute('class', 'photo-showcase-indicator');
+
+    var img = _.createEl('img');
+    img.setAttribute('src', 'https://unsplash.it/100/100?image=' + index);
+    img.setAttribute('alt', alt);
+
+    _.appendChild(li, a);
+    _.appendChild(a, img);
+    _.appendChild(controller, li);
+
+    // 클로저 함수 활용 예시
+    // 방법 1.
+    // a.onclick = function(index) {
+    //   return function(){
+    //     console.log(this, index);
+    //     return false;
+    //   };
+    // }(i);
+
+    // 방법 2.
+    // 이벤트 바인딩 (속성 <-> 함수)
+    // a.onclick = changeShowcaseViewWrapper(i);
+
+    // JavaScript 객체는 속성을 만들기가 너~~~~~무 쉽다.
+    // 방법 3.
+    // 객체의 속성을 추가하여 메모리하라.
+    // a???? <a> 요소노드 === JavaScript 객체
+    a.index = i;
+    a.onclick = changeShowcaseView;
+
+  }
+
+  // 이벤트 핸들러(함수) 정의
+  // 방법 2.
+  // function changeShowcaseViewWrapper(index) {
+    // return function changeShowcaseView() {
+    //   // this === 클릭한 <a>
+    //   console.log(this, index);
+    //   // 기본 동작 차단 (구형)
+    //   return false;
+    // };
+  // }
+
+  // 방법 3.
+  function changeShowcaseView() {
+    // this === 클릭한 <a>
+    // console.log(this, this.index);
+    var source = data[this.index];
+    var showcase = _.selector('.photo-showcase img');
+    showcase.setAttribute('alt', source.alt);
+    var showcase_old_src = showcase.getAttribute('src');
+
+    // 방법 1.
+    // .slice(), .indexOf() 를 활용한 예시
+    var end_index = showcase_old_src.indexOf('=') + 1;
+    var showcase_new_src = showcase_old_src.slice(0, end_index) + source.index;
+
+    // 방법 2.
+    // RegExp, replace() 를 활용한 예시
+    var showcase_new_src = showcase_old_src.replace(/=.+/, function(){
+      return '=' + source.index;
+    });
+
+    showcase.setAttribute('src', showcase_new_src);
+    // 기본 동작 차단 (구형)
+    return false;
+  };
+
+  // ------------------------------------------
+  // 수업 중에 살펴본 String.prototype 객체의 메서드
+  // .charAt(index)
+  // .substring(start[, end])
+  // .substr(start[, length])
+  // .indexOf(string)
+  // .slice(start[, end])
+  // .split(string) => array
+  // .replace(string|regexp, string|function)
+
+
+  // ---------------------------------------
+  // 접근성 개선
+
+  // 문서객체 참조
+  var container        = _.selector('.photo-showcase-container');
+  var container_active = 'active';
+  var indicator_first  = _.selector('li:first-child a', controller);
+  var indicator_last   = _.selector('li:last-child a', controller);
+
+  // focus, blur 이벤트 감지
+  indicator_first.onfocus = function() {
+    // container 요소에 활성화 클래스를 추가한다.
+    var container_class = container.getAttribute('class');
+    container_class += ' ' + container_active;
+    container.setAttribute('class', container_class);
+  };
+
+  indicator_last.onblur = function() {
+    // container 요소에 활성화 클래스를 제거한다.
+    var container_class = container.getAttribute('class');
+    container_class = container_class.replace(container_active, '').trim();
+    container.setAttribute('class', container_class);
+  };
+
 
 })(window, window.document, window.FDS);
