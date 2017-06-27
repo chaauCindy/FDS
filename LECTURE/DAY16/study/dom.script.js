@@ -1,6 +1,7 @@
 /*! dom.script.js @ 2017, yamoo9.net */
 
 // Emmet 설정
+// Emmet Game: 1기 안도훈 수료생 결과물 - https://ahndohun.github.io/emmet-game/
 (function(emmet){
   'use strict';
   emmet.require('textarea').setup({
@@ -79,22 +80,88 @@
   // DOM 삽입
   // .innerHTML
   // getter / setter
+
+  // .button.is-change-html-code <button> 요소를 클릭하면
+  var change_btn = $.selector('.button.is-change-html-code');
+  var textarea = $.selector('#user-html-code');
+  // 이벤트 바인딩
+  change_btn.onclick = render;
+
+  // 사람이 읽기 용이한(Readable) 키코드 객체
+  var keyboards = {
+    enter: 13
+  };
+
+  // 키보드 이벤트 감지 및 처리
+  textarea.onkeyup = function(e) {
+    var key = e.charCode || e.keyCode || e.which;
+    console.log(key);
+    if (key === keyboards.enter) { render(); }
+  };
+
+  // render 핸들러(함수)
+  function render() {
+    var html_code = textarea.value;
+    // #user-html-code <textarea> 요소의 값(value) -> HTML 코드를
+    // .html-wrapper 내부에 적용하여 화면을 업데이트 하시오.
+    $.selector('div.html-wrapper').innerHTML = html_code;
+  }
+
+
   // [GETTER] Node.innerHTML
   // [SETTER] Node.innerHTML = 'HTML Code';
 
-  // .insertAdjacentHTML()
+  // 크로스 브라우징
+  // prepend()
+  // append()
+  // before()
+  // after()
+  // .insertAdjacentHTML(positon, html_code)
+  // positon
+  // before, after
+  // begin, end
+  var target = $.selector('.insert-adjacent-html .target');
+  // target.insertAdjacentHTML('beforebegin', '<h2 class="beforebegin">beforebegin</h2>');
+  // target.insertAdjacentHTML('afterbegin', '<strong class="afterbegin">afterbegin</strong>');
+  // target.insertAdjacentHTML('beforeend', '<strong class="beforeend">beforeend</strong>');
+  // target.insertAdjacentHTML('afterend', '<h2 class="afterend">afterend</h2>');
+
   // .insertAdjacentElement()
+  target.insertAdjacentElement('beforebegin', $.createEl('h2', 'beforebegin'));
+  target.insertAdjacentElement('afterbegin', $.createEl('strong', 'afterbegin'));
+  target.insertAdjacentElement('beforeend', $.createEl('strong', 'beforeend'))
+  target.insertAdjacentElement('afterend', $.createEl('h2', 'afterend'));
+
   // .insertAdjacentText()
-
-
-  // 데이터 접두사 속성 제어
-  // .dataset
+  // target.insertAdjacentText('beforebegin', 'beforebegin');
+  // target.insertAdjacentText('afterbegin', 'afterbegin');
+  // target.insertAdjacentText('beforeend', 'beforeend');
+  // target.insertAdjacentText('afterend', 'afterend');
 
   // 속성 제어
   // .getAttribute()
   // .setAttribute()
   // .removeAttribute()
   // .hasAttribute()
+
+  // 데이터 접두사 속성 제어
+  // .dataset
+  // target.setAttribute('data-tag-name', target.localName);
+  // target.setAttribute('data-node-type', target.nodeType);
+  // target.setAttribute('data-has-class', target.hasAttribute('class'));
+  // console.log('target.dataset', target.dataset);
+
+  var dataMap = {
+    'data-tag-name': target.localName,
+    'data-node-type': target.nodeType,
+    'data-has-class': target.hasAttribute('class')
+  };
+
+  // 유틸리티 사용 예시
+  $.each(dataMap, function(key, value) {
+    target.setAttribute(key, value);
+  });
+
 
 
   // 스타일 제어
